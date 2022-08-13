@@ -7,10 +7,10 @@ export const  Statistics = ({ good, neutral, bad, positiveValue, total }) => {
 		<>
 	<StatsList >
 		<StatisticValue >Good: {good}</StatisticValue>
-      <StatisticValue >Neutral: {neutral}</StatisticValue>
-      <StatisticValue >Bad: {bad}</StatisticValue>
-      <StatisticValue>Total: {total}</StatisticValue>
-      <StatisticValue>Positive: {positiveValue}%</StatisticValue>
+    <StatisticValue >Neutral: {neutral}</StatisticValue>
+    <StatisticValue >Bad: {bad}</StatisticValue>
+    <StatisticValue>Total: {total}</StatisticValue>
+    <StatisticValue>Positive: {positiveValue}%</StatisticValue>
 	</StatsList>
 	</>
 )};

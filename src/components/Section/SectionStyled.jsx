@@ -3,7 +3,7 @@ import { centerBlock, font } from "../Styled/Mixins";
 
 export const Container = styled.div`
 	${centerBlock};
-	padding: 30px 0;
+	padding: 20px 0;
 	width: 380px;
 `;
 export const Title = styled.h2`

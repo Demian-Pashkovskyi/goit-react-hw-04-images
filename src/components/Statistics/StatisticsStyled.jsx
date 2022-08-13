@@ -1,20 +1,14 @@
 import styled from '@emotion/styled';
+import { font } from "../Styled/Mixins";
 
-export const Statistic = styled.div`
-height: 100px;
-  background-color: #0125;
-  width: 120px;
-  box-shadow: 0px 2px 4px -1px rgb(0 0 0 / 20%)ing: 16px;
-	wi
-background-color: yellowgreen
-`
 export const StatsList = styled.ul`
 display: flex;
-align-items: center;
+align-items: flex-start;
+flex-direction: column;
 `
 export const StatisticValue = styled.li`
-margin-right: 15px;
-  margin-left: 15px;
-  font-size: 14px;
-  font-family: monospace;
-  text-align: center;`
+	${font({ fs: 16, fw: 500, lh: 18 })};
+  margin: 5px 0;
+  font-family: Georgia;
+  text-align: center;
+	color: #000;`
