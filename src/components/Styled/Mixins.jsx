@@ -9,6 +9,10 @@ flex-wrap: ${fw ? fw : "no-wrap"};
 align-items:${ai ? ai : "center"};
 justify-content:${jc ? jc : "center"};
   `;
+	export const centerBlock = `
+  display: block;
+  margin: 0 auto;
+`;
 
 export const block = `
   display: block;
