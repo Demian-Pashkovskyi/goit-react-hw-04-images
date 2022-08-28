@@ -8,7 +8,7 @@ import { Modal } from './Modal/Modal';
 // import { Box } from 'components/Box';
 // import { Component } from 'react';
 // import { GlobalStyle } from './GlobalStyle';
-// import { getImages } from 'services/api';
+import { getImages } from 'service/api';
 // import { Searchbar } from './Searchbar/Searchbar';
 // import { ImageGallery } from './ImageGallery/ImageGallery';
 // import { Button } from './Button/Button';
