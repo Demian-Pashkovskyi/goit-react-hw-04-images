@@ -1,9 +1,9 @@
-import { ImageGallery } from './ImageGallery.styled';
+import { ImageGalleryWrapper } from './ImageGalleryStyled';
 import PropTypes from 'prop-types';
-import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
+import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 
 export const ImageGallery = ({ imagesList, searchValue, openModal }) => (
-  <ImageGallery>
+  <ImageGalleryWrapper>
     {imagesList.map(({ id, webformatURL, largeImageURL }) => (
       <ImageGalleryItem
         key={id}
@@ -14,7 +14,7 @@ export const ImageGallery = ({ imagesList, searchValue, openModal }) => (
         openModal={openModal}
       />
     ))}
-  </ImageGallery>
+  </ImageGalleryWrapper>
 );
 
 ImageGallery.propTypes = {
