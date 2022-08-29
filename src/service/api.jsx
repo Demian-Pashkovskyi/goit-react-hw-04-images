@@ -1,25 +1,10 @@
-import axios from 'axios';
+export const PER_PAGE = 12;
 
-axios.defaults.baseURL = 'https://pixabay.com/api/';
-
-export const getImages = async (query, currentPage = 1) => {
-  const result = await axios({
-    params: {
-      key: '28320130-19a63cf24e9bf5fe751a1157e',
-      image_type: 'photo',
-      orientation: 'horizontal',
-      page: currentPage,
-      per_page: 12,
-      q: query,
-    },
-  });
-  const requiredResult = result.data.hits.map(
-    ({ id, webformatURL, largeImageURL }) => ({
-      id,
-      webformatURL,
-      largeImageURL,
-    })
-  );
-
-  return requiredResult;
-};
+export async function getImages(page, query) {
+  const API_KEY = '28320130-19a63cf24e9bf5fe751a1157e';
+  const BASE_URL = `https://pixabay.com/api/?q=${query}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${PER_PAGE}`;
+  const response = await fetch(BASE_URL);
+  return response.ok
+    ? response.json()
+    : Promise.reject(new Error('Something went wrong, please try again'));
+}
