@@ -1,128 +1,111 @@
-import { Box } from '../components/Styled/Box';
+import { Box } from './Styled/Box';
 import { Component } from 'react';
-import { GlobalStyle } from '../components/Styled/GlobalStyle';
-import { getImages, PER_PAGE } from '../service/api';
-import { SearchBar } from './Searchbar/Searchbar';
+import { GlobalStyle } from './Styled/GlobalStyle';
+import { getImages } from '../service/api';
+import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
-import { toast } from 'react-toastify';
-
 
 export class App extends Component {
   state = {
-    query: '',
-    page: 1,
+    searchValue: '',
     imagesList: [],
-    isLoading: false,
-    currentImgPerPage: null,
+    page: 1,
     error: null,
+    isLoading: false,
     isModalOpen: false,
     modalImage: '',
   };
 
-  componentDidUpdate(_, prevState) {
-    const prevQuery = prevState.query;
-    const nextQuery = this.state.query;
-    if (prevQuery !== nextQuery) {
-      this.getImagesData();
-    }
+  async componentDidUpdate(prevProps, prevState) {
+    try {
+      const { searchValue, page } = this.state;
 
-    if (this.state.page > 2) {
-      window.scrollTo({
-        top: document.documentElement.scrollHeight,
-        behavior: 'smooth',
-      });
+      if (prevState.searchValue !== searchValue) {
+        this.setState({
+          imagesList: await getImages(searchValue),
+        });
+        this.setState({ isLoading: false });
+      }
+
+      if (prevState.page !== page) {
+        const extendedImagesList = await getImages(searchValue, page);
+
+        this.setState(prevState => {
+          return {
+            imagesList: [...prevState.imagesList, ...extendedImagesList],
+          };
+        });
+        this.setState({ isLoading: false });
+      }
+    } catch (error) {
+      this.setState({ error });
     }
   }
 
-  handleFormSubmit = query => {
-    this.setState(() => {
-      return { query: query, page: 1, imagesList: [] };
+  onSubmit = searchValue => {
+    this.setState({ isLoading: true, searchValue });
+  };
+
+  loadMoreImages = () => {
+    this.setState(prevState => {
+      return {
+        isLoading: true,
+        page: prevState.page + 1,
+      };
     });
   };
 
-  handleLoadMoreImg = () => {
-    this.getImagesData();
-  };
-
-  getImagesData = async () => {
-    try {
-      this.setState({ isLoading: true });
-      const { hits, totalHits } = await getImages(
-        this.state.page,
-        this.state.query
-      );
-      if (totalHits === 0) {
-        toast.error('Images not found ...');
-        this.setState({ isLoading: false, currentImgPerPage: null });
-        return;
-      }
-
-      const imagesList = this.imagesArray(hits);
-
-      this.setState(prevState => {
-        return {
-          imagesList: [...prevState.imagesList, ...imagesList],
-          currentImgPerPage: hits.length,
-          page: prevState.page + 1,
-        };
-      });
-    } catch (error) {
-      console.log(error);
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  };
-
-  imagesArray = data => {
-    return data.map(({ id, largeImageURL, tags, webformatURL }) => {
-      return { id, largeImageURL, tags, webformatURL };
+  openModal = imgId => {
+    this.setState({
+      isModalOpen: true,
+      modalImage: this.state.imagesList.find(image => image.id === imgId)
+        .largeImageURL,
     });
   };
 
-  toggleModal = () => {
-    this.setState(({ isModalOpen }) => ({
-      isModalOpen: !isModalOpen,
-    }));
+  closeModal = () => {
+    this.setState({ isModalOpen: false });
   };
-  openModal = modalImage => {
-    this.setState({ modalImage }, () => {
-      this.toggleModal();
-    });
-  };
+
   render() {
-    const { imagesList, isLoading, currentImgPerPage, error, isModalOpen, modalImage } =
-      this.state;
-    return (
-			<>
-			<GlobalStyle />
-      <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
-        <SearchBar onSubmit={this.handleFormSubmit} />
+    const {
+      imagesList,
+      searchValue,
+      error,
+      isLoading,
+      isModalOpen,
+      modalImage,
+    } = this.state;
 
-          {imagesList.length > 0 && !error && (
+    return (
+      <>
+        <GlobalStyle />
+        <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
+          <Searchbar onSubmit={this.onSubmit} />
+          {isLoading && <Loader />}
+          {error && <p>Whoops, something went wrong: {error.message}</p>}
+          {!!imagesList.length && (
             <>
-              <ImageGallery imagesList={imagesList} onClick={this.openModal} />
-              {currentImgPerPage && currentImgPerPage < PER_PAGE && (
-                <p>No more pictures</p>
-              )}
+              <ImageGallery
+                imagesList={imagesList}
+                searchValue={searchValue}
+                openModal={this.openModal}
+              />
+              <Box display="flex" justifyContent="center">
+                <Button loadMoreImages={this.loadMoreImages} />
+              </Box>
             </>
           )}
-
-          {isModalOpen && (
-            <Modal onClose={this.toggleModal}>
-              <img src={modalImage} alt="" />
-            </Modal>
-          )}
-
-          {currentImgPerPage === PER_PAGE && !isLoading && (
-            <Button onClick={this.handleLoadMoreImg} />
-          )}
-          {isLoading && <Loader />}
-      </Box>
-			</>
+        </Box>
+        {isModalOpen && (
+          <Modal closeModal={this.closeModal}>
+            <img src={modalImage} alt={searchValue} />
+          </Modal>
+        )}
+      </>
     );
   }
 }

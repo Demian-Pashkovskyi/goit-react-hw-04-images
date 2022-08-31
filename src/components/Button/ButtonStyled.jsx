@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "@emotion/styled";
 
 export const LoadMoreButton = styled.button`
   padding: 8px 16px;

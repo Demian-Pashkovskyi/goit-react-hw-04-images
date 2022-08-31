@@ -1,7 +1,8 @@
-import PropTypes from 'prop-types';
-import { Component } from 'react';
-import { createPortal } from 'react-dom';
+import React, { Component } from 'react';
+import PropTypes  from 'prop-types';
 import { Overlay, ModalWindow } from './ModalStyled';
+import { createPortal } from 'react-dom';
+
 
 const modalRoot = document.querySelector('#modal-root');
 export class Modal extends Component {
@@ -17,14 +18,14 @@ export class Modal extends Component {
     window.removeEventListener('keydown', this.handleKeyDown);
   }
 
-  handleClick = e => {
-    if (e.currentTarget === e.target) {
+  handleClick = evt => {
+    if (evt.currentTarget === evt.target) {
       this.props.closeModal();
     }
   };
 
-  handleKeyDown = e => {
-    if (e.code === 'Escape') {
+  handleKeyDown = evt => {
+    if (evt.code === 'Escape') {
       this.props.closeModal();
     }
   };
