@@ -1,45 +1,38 @@
-import React, { Component } from 'react';
-import { toast } from 'react-toastify';
-import { Form, Input, Button, Header, Icon} from "./SearchbarStyled"
+import { Formik } from 'formik';
+import PropTypes from 'prop-types';
+import {
+  SearchBar,
+  SearchForm,
+  SearchFormButton,
+  SearchFormButtonLabel,
+  SearchFormInput,
+} from './SearchbarStyled'
 
+export const Searchbar = ({ onSubmit }) => (
+  <SearchBar>
+    <Formik
+      initialValues={{ search: '' }}
+      onSubmit={async values => await onSubmit(values.search)}
+    >
+      {({ isSubmitting }) => (
+        <SearchForm>
+          <SearchFormButton type="submit" disabled={isSubmitting}>
+            <SearchFormButtonLabel>Search</SearchFormButtonLabel>
+          </SearchFormButton>
 
-export class SearchBar extends Component {
-  state = {
-    query: '',
-  };
-
-  onChange = event => {
-    this.setState({ query: event.currentTarget.value });
-  };
-
-  onSubmit = event => {
-    event.preventDefault();
-    if (this.state.query.trim() === '') {
-     return toast.error('Sorry, no empty search');
-   
-    }
-    this.props.onSubmit(this.state.query);
-    this.setState({ query: '' });
-  };
-
-  render() {
-    return (
-      <Header>
-        <Form onSubmit={this.onSubmit}>
-          <Input
-            onChange={this.onChange}
-            value={this.state.query}
-            name="query"
+          <SearchFormInput
             type="text"
+            name="search"
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-          />{' '}
-          <Button type="submit">
-            <Icon />
-          </Button>
-        </Form>
-      </Header>
-    );
-  }
-}
+          />
+        </SearchForm>
+      )}
+    </Formik>
+  </SearchBar>
+);
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
