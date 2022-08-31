@@ -100,7 +100,7 @@ export class App extends Component {
 			<>
 			<GlobalStyle />
       <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
-        <SearchBar onSubmit={this.handleFormSubmit} />
+        <Searchbar onSubmit={this.handleFormSubmit} />
 
           {imagesList.length > 0 && !error && (
             <>
