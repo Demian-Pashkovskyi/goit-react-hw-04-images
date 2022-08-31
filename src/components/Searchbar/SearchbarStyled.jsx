@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 import { BiSearchAlt } from 'react-icons/bi';
+import searchIcon from '../Styled/search.svg';
+import { Form, Field } from 'formik';
 
 export const Header = styled.header`
   display: flex;
@@ -10,7 +12,7 @@ export const Header = styled.header`
   background-color: RGBA(0, 8, 0, 0.68);
   border-bottom: 4px solid RGBA(0, 8, 0, 0.1);
 `;
-export const Form = styled.form`
+export const Form = styled(Form)`
   position: relative;
   display: flex;
   align-items: center;
@@ -19,7 +21,7 @@ export const Form = styled.form`
   border-bottom: 4px solid RGBA(0, 8, 0, 0.1);
 `;
 
-export const Input = styled.input`
+export const Input = styled(Field)`
   margin-right: 5px;
   border: 1px solid RGBA(255, 255, 0, 0.08);
   border-radius: 4px;
@@ -40,6 +42,7 @@ export const Icon = styled(BiSearchAlt)`
   fill: RGBA(0, 8, 0, 0.68);
 `;
 export const Button = styled.button`
+  background-image: url(${searchIcon});
   position: absolute;
   top: 24%;
   left: 85%;
