@@ -1,5 +1,5 @@
 import { Box } from './Styled/Box';
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { GlobalStyle } from './Styled/GlobalStyle';
 import { getImages } from '../service/api';
 import { Searchbar } from './Searchbar/Searchbar';
@@ -8,104 +8,89 @@ import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
 
-export class App extends Component {
-  state = {
-    searchValue: '',
-    imagesList: [],
-    page: 1,
-    error: null,
-    isLoading: false,
-    isModalOpen: false,
-    modalImage: '',
+export const App = () => {
+  const [searchValue, setSearchValue] = useState(() => '');
+  const [imagesList, setImagesList] = useState(() => []);
+  const [page, setPage] = useState(() => 1);
+  const [error, setError] = useState(() => null);
+  const [isLoading, setIsLoading] = useState(() => false);
+  const [isModalOpen, setIsModalOpen] = useState(() => false);
+  const [modalImage, setModalImage] = useState(() => '');
+
+
+useEffect(() => {
+	try {
+		if (!searchValue) {
+			return;
+		}
+
+		if (page === 1) {
+			(async () => {
+				setImagesList(await getImages(searchValue));
+				setIsLoading(false);
+			})();
+		}
+
+		if (page > 1) {
+			(async () => {
+				const extendedImagesList = await getImages(searchValue, page);
+
+				setImagesList(prevState => [...prevState, ...extendedImagesList]);
+				setIsLoading(false);
+			})();
+		}
+	} catch (error) {
+		setError(error);
+	}
+}, [searchValue, page]);
+
+
+	const onSubmit = searchValue => {
+    setIsLoading(true);
+    setSearchValue(searchValue);
+    setPage(1);
   };
 
-  async componentDidUpdate(prevProps, prevState) {
-    try {
-      const { searchValue, page } = this.state;
-
-      if (prevState.searchValue !== searchValue) {
-        this.setState({
-          imagesList: await getImages(searchValue),
-        });
-        this.setState({ isLoading: false });
-      }
-
-      if (prevState.page !== page) {
-        const extendedImagesList = await getImages(searchValue, page);
-
-        this.setState(prevState => {
-          return {
-            imagesList: [...prevState.imagesList, ...extendedImagesList],
-          };
-        });
-        this.setState({ isLoading: false });
-      }
-    } catch (error) {
-      this.setState({ error });
-    }
-  }
-
-  onSubmit = searchValue => {
-    this.setState({ isLoading: true, searchValue });
+  const loadMoreImages = () => {
+    setIsLoading(true);
+    setPage(prevPage => prevPage + 1);
   };
 
-  loadMoreImages = () => {
-    this.setState(prevState => {
-      return {
-        isLoading: true,
-        page: prevState.page + 1,
-      };
-    });
+  const openModal = imgId => {
+    setIsModalOpen(true);
+    setModalImage(imagesList.find(image => image.id === imgId).largeImageURL);
   };
 
-  openModal = imgId => {
-    this.setState({
-      isModalOpen: true,
-      modalImage: this.state.imagesList.find(image => image.id === imgId)
-        .largeImageURL,
-    });
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
-  closeModal = () => {
-    this.setState({ isModalOpen: false });
-  };
 
-  render() {
-    const {
-      imagesList,
-      searchValue,
-      error,
-      isLoading,
-      isModalOpen,
-      modalImage,
-    } = this.state;
-
-    return (
-      <>
-        <GlobalStyle />
-        <Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
-          <Searchbar onSubmit={this.onSubmit} />
-          {isLoading && <Loader />}
-          {error && <p>Whoops, something went wrong: {error.message}</p>}
-          {!!imagesList.length && (
-            <>
-              <ImageGallery
-                imagesList={imagesList}
-                searchValue={searchValue}
-                openModal={this.openModal}
-              />
-              <Box display="flex" justifyContent="center">
-                <Button loadMoreImages={this.loadMoreImages} />
-              </Box>
-            </>
-          )}
-        </Box>
-        {isModalOpen && (
-          <Modal closeModal={this.closeModal}>
-            <img src={modalImage} alt={searchValue} />
-          </Modal>
-        )}
-      </>
-    );
-  }
+  return (
+		<>
+			<GlobalStyle />
+			<Box display="grid" gridTemplateColumns="1fr" gridGap="16px" pb="24px">
+				<Searchbar onSubmit={onSubmit} />
+				{isLoading && <Loader />}
+				{error && <p>Whoops, something went wrong: {error.message}</p>}
+				{!!imagesList.length && (
+					<>
+						<ImageGallery
+							imagesList={imagesList}
+							searchValue={searchValue}
+							openModal={openModal}
+						/>
+						<Box display="flex" justifyContent="center">
+							<Button loadMoreImages={loadMoreImages} />
+						</Box>
+					</>
+				)}
+			</Box>
+			{isModalOpen && (
+				<Modal closeModal={closeModal}>
+					<img src={modalImage} alt={searchValue} />
+				</Modal>
+			)}
+		</>
+	);
 }
